@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  frontend:
+    image: registry.git.vmo.dev/c11/vmo22179-vmo-dux-system/fe-dux-ecosystem:latest
+    container_name: fe-dux-ecosystem
+    restart: always
+    networks:
+      - dux-network
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+  backend:
+    image: registry.git.vmo.dev/c11/vmo22179-vmo-dux-system/be-dux-ecosystem:latest
+    container_name: be-dux-ecosystem
+    restart: always
+    networks:
+      - dux-network
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:4.2
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGODB_DATABASE: be_dux
+    networks:
+      - dux-network
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data:/data/db
+networks:
+  dux-network:
+    driver: bridge
